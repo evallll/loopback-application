@@ -1,0 +1,33 @@
+#!/bin/bash
+
+# Check dependencies
+if ! command -v pw-loopback &> /dev/null; then
+    echo "The dependency 'pw-loopback' could not be found. Please install it or make sure it is in your PATH environment variable and try again."
+    exit 1
+elif ! command -v pw-cli &> /dev/null; then
+    echo "The dependency 'pw-cli' could not be found. Please install it or make sure it is in your PATH environment variable and try again."
+    exit 1
+fi
+
+if [ "$#" -ne 1 ]; then
+    echo "Required argument at position 1, loopback-application <node_target> (can be anything, e.g Chromium, Firefox, etc. You can refer to pavucontrol or pw-cli for a list of available nodes)"
+    exit 1
+fi
+
+NODE_TARGET="$1"
+NODE_DESCRIPTION="$NODE_TARGET Loopback"
+
+# I'll get all available nodes and check if the node exists, node.name should be a reliable way and hasn't caused any problems.
+if ! pw-cli ls Node | grep -q "node.name = \"$NODE_TARGET\""; then
+    echo "Application node '$NODE_TARGET' couldn't be found in the PipeWire nodes list."
+    exit 1
+fi
+
+# Telling the user that the loopback is starting and the name of the device it started on.
+echo "Loopback starting for \"$NODE_TARGET\" on virtual device \"$NODE_DESCRIPTION\""
+
+# I use pw-loopback since it is very neat to use, then I make a new loopback microphone with the specialised name.
+pw-loopback --capture-props="node.target=${NODE_TARGET}" --playback-props="media.class=Audio/Source node.name=\"${NODE_TARGET}_lbmic\" node.description=\"${NODE_DESCRIPTION}\""
+
+# Notify user if the loopback has been destroyed and exit.
+echo "Loopback has been destroyed on virtual device \"$NODE_DESCRIPTION\""
