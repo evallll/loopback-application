@@ -10,7 +10,7 @@ elif ! command -v pw-cli &> /dev/null; then
 fi
 
 if [ "$#" -ne 1 ]; then
-    echo "Required argument at position 1, loopback-application <node_target> (can be anything, e.g Chromium, Firefox, etc. You can refer to pavucontrol or pw-cli for a list of available nodes)"
+    echo "Required argument at position 1, $(basename "$0") <node_target> (can be anything, e.g Chromium, Firefox, etc. You can refer to pavucontrol or pw-cli for a list of available nodes)"
     exit 1
 fi
 
